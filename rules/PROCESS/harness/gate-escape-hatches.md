@@ -36,3 +36,14 @@ On a deny: read the warning at the top of the turn's prompt context, run `better
 ## Anti-patterns
 
 Retrying the denied Write unchanged; calling `query_skills`/`get_skill` to "earn" a hook receipt (advisory only); disabling the whole hook shim instead of the specific gate; treating a deny as agent misbehavior when the warning line already names the infra failure.
+
+## Evidence contract (since 0.5.1)
+
+The receipt gate denies ONLY sessions with delivery evidence (a recorded
+`prompt_serve`) that lack the current turn's receipt. A session the prompt
+hook has NEVER served is allowed with the loud warning "this session has
+never received a prompt-hook delivery" (audited as `gate_bypass_no_evidence`)
+— on that warning, check `~/.betterai/hook-errors.log` and the client's
+stacked UserPromptSubmit hook wiring. Every delivery is audited as
+`prompt_serve`, so "was this session ever served?" is answerable from
+`audit.jsonl` alone.
